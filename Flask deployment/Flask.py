@@ -13,16 +13,21 @@ import joblib
 
 app = Flask(__name__)
 
-# Load the pre-trained model and tokenizer
+max_length = 138
+
 with open('Testing_GPU_training/model_cudnn_lstm_architecture.joblib', 'rb') as f:
     model_json = joblib.load(f)
 
 m1_loaded = model_from_json(model_json)
-
-# Load the model weights
 m1_loaded.load_weights('Testing_GPU_training/model_cudnn_lstm_weights.h5')
 
-tokenizer = Tokenizer()
+import pickle
+
+path = "Testing_GPU_training\Tokenizer.pickle"
+
+# Load the tokenizer
+with open(path, 'rb') as handle:
+    tokenizer = pickle.load(handle)
 
 
 def predict_sarcasm(user_input, model, tokenizer, max_length, threshold=0.5):
@@ -43,7 +48,6 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     user_input = request.form['user_input']
-    max_length = 138
     predicted_label, predicted_prob = predict_sarcasm(user_input,m1_loaded,tokenizer, max_length, threshold=0.3)
     
     if predicted_label == 1:

@@ -13,17 +13,17 @@ import joblib
 
 app = Flask(__name__)
 
-max_length = 138
+max_length = 140
 
-with open('Twitter_GPU\model_cudnn_lstm_architecture.joblib', 'rb') as f:
+with open('Flask\Flask_GPU\model_cudnn_lstm_architecture2.joblib', 'rb') as f:
     model_json = joblib.load(f)
 
 m1_loaded = model_from_json(model_json)
-m1_loaded.load_weights('Twitter_GPU\model_cudnn_lstm_weights.h5')
+m1_loaded.load_weights('Flask\Flask_GPU\model_cudnn_lstm_weights2.h5')
 
 import pickle
 
-path = "Twitter_GPU\Tokenizer.pickle"
+path = "Flask\Flask_GPU\Tokenizer2.pickle"
 
 # Load the tokenizer
 with open(path, 'rb') as handle:

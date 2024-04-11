@@ -52,17 +52,17 @@ def remove_Sarcasm_hashtag():
 #######################################################################################
 
 # Undersampling
-def undersample(dataset):
-    class_counts = dataset['isSarcastic'].value_counts()
+def undersample(dataset, colName):
+    class_counts = dataset[colName].value_counts()
 
     majority_class = class_counts.idxmax()
     minority_class = class_counts.idxmin()
 
     minority_class_count = class_counts[minority_class]
 
-    majority_class_sampled = dataset[dataset['isSarcastic'] == majority_class].sample(n=minority_class_count, random_state=42)
+    majority_class_sampled = dataset[dataset[colName] == majority_class].sample(n=minority_class_count, random_state=42)
 
-    balanced_data = pd.concat([majority_class_sampled, dataset[dataset['isSarcastic'] == minority_class]])
+    balanced_data = pd.concat([majority_class_sampled, dataset[dataset[colName] == minority_class]])
 
     # Shuffle the balanced dataset
     balanced_data = balanced_data.sample(frac=1, random_state=1).reset_index(drop=True)

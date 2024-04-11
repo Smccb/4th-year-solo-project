@@ -15,11 +15,11 @@ app = Flask(__name__)
 
 max_length = 138
 
-with open('model_cudnn_lstm_architecture.joblib', 'rb') as f:
+with open('Twitter_GPU\model_cudnn_lstm_architecture.joblib', 'rb') as f:
     model_json = joblib.load(f)
 
 m1_loaded = model_from_json(model_json)
-m1_loaded.load_weights('model_cudnn_lstm_weights.h5')
+m1_loaded.load_weights('Twitter_GPU\model_cudnn_lstm_weights.h5')
 
 import pickle
 

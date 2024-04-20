@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,5 +8,124 @@
 <body>
     <h1>Prediction Result</h1>
     <p>{{ prediction }}</p>
+    <a href="/" class="btn-back">Back to Home</a>
+</body>
+</html> -->
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .prediction-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            text-align: center;
+        }
+        .btn-back {
+            padding: 10px 20px;
+            background-color: #6aa84f;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background-color: #45818e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction Result</h1>
+    <div class="prediction-box" role="alert" aria-live="assertive">
+        <p>{{ prediction }}</p>
+        <p>Certainty: {{ certainty }}</p>
+    </div>
+    <a href="/" class="btn-back" role="button">Back to Home</a>
 </body>
 </html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+            padding: 20px; /* Consistent padding with the input page */
+        }
+        .prediction-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%; 
+            max-width: 500px; 
+            margin: auto;
+        }
+        .btn-back {
+            display: inline-block; /* Make the link behave like a button */
+            padding: 10px 20px;
+            background-color: #6aa84f;
+            color: white;
+            border: none;
+            border-radius: 4px; /* Match the border-radius */
+            text-decoration: none;
+            transition: background-color 0.3s ease; /* Transition for hover effect */
+            margin-top: 20px; /* Spacing from the box */
+        }
+        .btn-back:hover {
+            background-color: #45818e; /* Hover effect color */
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction Result</h1>
+    <div class="prediction-box">
+        <p>{{ prediction }}</p>
+        <p>Certainty: {{ certainty }}</p>
+        <a href="/" class="btn-back" role="button">Back to Home</a>
+    </div>
+</body>
+</html>
+

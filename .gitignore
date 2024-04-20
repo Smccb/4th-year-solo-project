@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Folders I want to leave out
+hyperband/
+hyperband_news/
+
 # C extensions
 *.so
 

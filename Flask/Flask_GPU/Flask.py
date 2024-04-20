@@ -13,17 +13,17 @@ import joblib
 
 app = Flask(__name__)
 
-max_length = 138
+max_length = 140
 
-with open('Twitter_GPU\model_cudnn_lstm_architecture.joblib', 'rb') as f:
+with open('Flask\Flask_GPU\model_cudnn_lstm_architecture2.joblib', 'rb') as f:
     model_json = joblib.load(f)
 
 m1_loaded = model_from_json(model_json)
-m1_loaded.load_weights('Twitter_GPU\model_cudnn_lstm_weights.h5')
+m1_loaded.load_weights('Flask\Flask_GPU\model_cudnn_lstm_weights2.h5')
 
 import pickle
 
-path = "Twitter_GPU\Tokenizer.pickle"
+path = "Flask\Flask_GPU\Tokenizer2.pickle"
 
 # Load the tokenizer
 with open(path, 'rb') as handle:
@@ -37,9 +37,21 @@ def predict_sarcasm(user_input, model, tokenizer, max_length, threshold=0.5):
 
     # Make prediction
     prediction_prob = model.predict(user_input_padded)
-    predicted_label = 1 if prediction_prob[0, 0] > threshold else 0
 
-    return predicted_label, prediction_prob
+    # Work the certaintly of the model
+    probability_sarcastic = float(prediction_prob[0, 0])
+    probability_not_sarcastic = 1.0 - probability_sarcastic
+
+    if prediction_prob[0, 0] > threshold:
+        #predicted_label = 1
+        predicted_label = "The model predicts that the input is sarcastic."
+        certainty = f"{probability_sarcastic * 100:.2f}%"
+
+    else:
+        #predicted_label = 0
+        predicted_label = "The model predicts that the input is not sarcastic."
+        certainty = f"{probability_not_sarcastic * 100:.2f}%"
+    return predicted_label, certainty
 
 @app.route('/')
 def index():
@@ -48,13 +60,10 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     user_input = request.form['user_input']
-    predicted_label, predicted_prob = predict_sarcasm(user_input,m1_loaded,tokenizer, max_length, threshold=0.3)
+    predicted_label, certainty = predict_sarcasm(user_input,m1_loaded,tokenizer, max_length, threshold=0.5)
     
-    if predicted_label == 1:
-        output = "The model predicts that the input is sarcastic."
-    else:
-        output = "The model predicts that the input is not sarcastic."
-    return render_template('result.html', prediction=output)
+
+    return render_template('result.html', prediction=predicted_label, certainty=certainty)
 
 if __name__ == '__main__':
     app.run(debug=True)

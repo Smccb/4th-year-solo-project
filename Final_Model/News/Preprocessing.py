@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.utils import to_categorical
+from imblearn.over_sampling import RandomOverSampler
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords
@@ -15,6 +16,9 @@ import re
 import emoji
 import json
 
+import text_mining_utils as tmu
+
+################################################################################
 
 def remove_Sarcasm_hashtag():
     file_path = 'Datasets/Train_v1.txt'
@@ -68,6 +72,27 @@ def undersample(dataset, colName):
     balanced_data = balanced_data.sample(frac=1, random_state=1).reset_index(drop=True)
     return balanced_data
 
+#####################################################
+
+# Random oversampling
+def oversample(text, label, x_name, y_name):
+    text = text.values.reshape(-1, 1)
+    
+    # Define and apply RandomOverSampler
+    ros = RandomOverSampler(random_state=42)
+    X_res, y_res = ros.fit_resample(text, label)
+    
+    X_res = X_res.flatten()
+    
+    # Create and return the new DataFrame with correctly shaped data
+    oversampled_dataset = pd.DataFrame({
+        x_name: X_res,
+        y_name: y_res
+    })
+
+    return oversampled_dataset
+
+
 ################################################
 
 # Remove stopwords
@@ -118,6 +143,14 @@ def replaceEmoji_emoticon(dataset):
     dataset.text = dataset.text.apply(replace_emoticons)
     dataset.text = dataset.text.apply(replace_emojis)
     return dataset
+
+#######################################################################
+
+#Remove hashtag and word
+# Function to remove hashtags from a single text
+def remove_hashtags(text):
+    pattern = r'\#\w+'
+    return re.sub(pattern, '', text)
 
 ######################################################################
 
@@ -182,4 +215,119 @@ def turnToJSON(dataset):
 
 #################################################################
 
-#lemin
+#stemming
+from nltk.stem import PorterStemmer
+stemmer = PorterStemmer()
+
+def stem_words(text):
+    return [stemmer.stem(word) for word in text]
+
+#####################################################################
+
+#remove punctuation 
+def remove_punctuation(text):
+    text = re.sub(r'[^\w\s]', '', text)
+    return text
+
+####################################################################
+
+#remove urls
+def remove_URL(text):
+    text = re.sub(r'http\S+', '', text)
+    return text
+
+#################################################################
+
+#remove # from the rest of the text
+def remove_hashtag_only(text):
+    text = re.sub(r'#', '', text)
+    return text
+
+################################################################
+
+# Replace contractions
+#contradictions fixes
+def contractions_replaced(dataset , col_name):
+    contractions_dict = {
+        "ain't": "am not",
+        "aren't": "are not",
+        "can't": "cannot",
+        "could've": "could have",
+        "couldn't": "could not",
+        "didn't": "did not",
+        "doesn't": "does not",
+        "don't": "do not",
+        "hadn't": "had not",
+        "hasn't": "has not",
+        "haven't": "have not",
+        "he'd": "he would",
+        "he'll": "he will",
+        "he's": "he is",
+        "how'd": "how did",
+        "how'll": "how will",
+        "how's": "how is",
+        "i'd": "i would",
+        "i'll": "i will",
+        "i'm": "i am",
+        "i've": "i have",
+        "isn't": "is not",
+        "it'd": "it would",
+        "it'll": "it will",
+        "it's": "it is",
+        "let's": "let us",
+        "might've": "might have",
+        "must've": "must have",
+        "shan't": "shall not",
+        "she'd": "she would",
+        "she'll": "she will",
+        "she's": "she is",
+        "should've": "should have",
+        "shouldn't": "should not",
+        "that'll": "that will",
+        "that's": "that is",
+        "there's": "there is",
+        "they'd": "they would",
+        "they'll": "they will",
+        "they're": "they are",
+        "they've": "they have",
+        "wasn't": "was not",
+        "we'd": "we would",
+        "we'll": "we will",
+        "we're": "we are",
+        "we've": "we have",
+        "weren't": "were not",
+        "what'll": "what will",
+        "what're": "what are",
+        "what's": "what is",
+        "what've": "what have",
+        "when's": "when is",
+        "where'd": "where did",
+        "where's": "where is",
+        "where've": "where have",
+        "who'd": "who would",
+        "who'll": "who will",
+        "who's": "who is",
+        "who've": "who have",
+        "why'd": "why did",
+        "why'll": "why will",
+        "why's": "why is",
+        "won't": "will not",
+        "would've": "would have",
+        "wouldn't": "would not",
+        "you'd": "you would",
+        "you'll": "you will",
+        "you're": "you are",
+        "you've": "you have"
+    }
+    
+    dataset[col_name] = dataset[col_name].apply(lambda x: tmu.resolve_contractions(x, contractions_dict))
+    
+    return dataset
+
+#  ^uses tmu
+
+######################################################################
+
+
+
+

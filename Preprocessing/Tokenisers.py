@@ -44,3 +44,4 @@ def tweetTokenizer(X_train, X_test, max_length):
     X_test = pad_sequences(X_test_sequences, maxlen=max_length)
 
     return X_train, X_test, tokenizer
+

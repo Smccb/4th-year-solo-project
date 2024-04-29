@@ -32,22 +32,22 @@ column_name_to_remove = 'article_link'
 dataset = dataset.drop(columns=[column_name_to_remove])
 
 ##########################################################################
-#Preproccessing
+#preproccessing
 y_name = "is_sarcastic"
 x_name = "headline"
-# Random oversample
+#random oversample
 dataset = prep.oversample(dataset.headline, dataset.is_sarcastic, x_name, y_name)
 
-# Lowercasing text
+#lowercasing text
 dataset['headline'] = dataset['headline'].str.lower()
 
-# Replace contractions
+#replace contractions
 dataset = prep.contractions_replaced(dataset , x_name)
 
 
 
 ##########################################################################
-# Split training and testing data
+#split training and testing data
 
 X_train, X_test, y_train, y_test = train_test_split(dataset['headline'], dataset['is_sarcastic'], test_size=0.3, random_state=42)
 
@@ -59,13 +59,13 @@ dataset = pd.read_csv(file_path, sep='\t', header=None, names=column_names)
 test_text = dataset['text']
 test_labels = dataset['isSarcastic']
 
-# Shuffle and quarter dataset
+#shuffle and quarter dataset
 X_half1, X_half2, y_half1, y_half2 = train_test_split(test_text, test_labels, test_size=0.5, random_state=1)
 X_test, X_quarter2, y_test, y_quarter2 = train_test_split(X_half1, y_half1, test_size=0.5, random_state=1)
 
 #######################################################################
 
-# Tokenizer
+#tokenizer
 max_length = 100 #140 for using combined model saved otherwise 100
 X_train, X_test, tokenizer =tokenise.regTokeniser(X_train, X_test, max_length)
 

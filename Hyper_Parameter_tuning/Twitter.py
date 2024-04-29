@@ -20,11 +20,11 @@ import Preprocessing as prep
 import Tokenisers as tokenise
 
 
-# Read the dataset
+#read the dataset
 dataset = pd.read_json("Hyper_Parameter_tuning/data_without_hashtags.json")
 
 #####################################################################
-#Preprocessing 
+#preprocessing 
 x_name =  'text'
 y_name = 'isSarcastic'
 
@@ -36,12 +36,12 @@ dataset['text'] = dataset.text.apply(prep.remove_user_mentions)
 
 #######################################################################
 
-# Split the dataset into training and testing sets
+#split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(dataset['text'], dataset['isSarcastic'], test_size=0.3, random_state=42)
 
 #########################################################################
 
-# Tokenizer
+#tokenizer
 
 max_length = 140
 X_train, X_test, tokenizer =tokenise.tweetTokenizer(X_train, X_test, max_length)
@@ -74,7 +74,7 @@ with open('Final_Model/Twitter/TokenizerT2.pickle', 'wb') as handle:
 
 ##################################################################
 
-# Create model
+#create model
 from keras.models import Sequential
 from keras.layers import Embedding, LSTM, Dense
 from keras.optimizers import Adam
@@ -97,7 +97,7 @@ def build_model(hp):
 
     model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
     return model
-# Instantiate the tuner
+#instantiate the tuner
 tuner = Hyperband(
     build_model,
     objective='val_accuracy',
@@ -110,7 +110,7 @@ tuner = Hyperband(
 
 tuner.search(x=X_train, y=y_train, epochs=150, validation_data=(X_test, y_test))
 
-# Get the best model
+#get the best model
 best_model = tuner.get_best_models(num_models=1)[0]
 best_model.summary()
 

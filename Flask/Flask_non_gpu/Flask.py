@@ -29,7 +29,6 @@ def predict_sarcasm(user_input, model, tokenizer, max_length, threshold=0.5):
     user_input_sequence = tokenizer.texts_to_sequences([user_input])
     user_input_padded = pad_sequences(user_input_sequence, maxlen=max_length)
 
-    # Make prediction
     prediction_prob = model.predict(user_input_padded)
     predicted_label = 1 if prediction_prob[0, 0] > threshold else 0
 

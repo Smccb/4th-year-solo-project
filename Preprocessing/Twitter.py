@@ -24,8 +24,7 @@ import Tokenisers as tokenise
 dataset = pd.read_json("Final_Model/Twitter/data_without_hashtags.json")
 
 #####################################################################
-#Preprocessing 
-#Testing different deploments
+#preprocessing 
 x_name =  'text'
 y_name = 'isSarcastic'
 #dataset = prep.undersample(dataset, 'isSarcastic')
@@ -41,13 +40,13 @@ dataset['text'] = dataset.text.apply(prep.remove_user_mentions)
 col_name = 'text'
 #dataset = prep.contractions_replaced(dataset , x_name)
 
-# Remove stopwords
+#remove stopwords
 #dataset['text'] = dataset.text.apply(prep.remove_stopwords)
 #dataset['text'] = dataset['text'].apply(prep.stem_words)
 
 #######################################################################
 
-# Split the dataset into training and testing sets
+#split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(dataset['text'], dataset['isSarcastic'], test_size=0.3, random_state=42)
 
 #########################################################################
@@ -61,7 +60,7 @@ X_train, X_test, tokenizer =tokenise.tweetTokenizer(X_train, X_test, max_length)
 
 ##################################################################
 
-# Create model
+#create model
 embedding_dim = 100
 vocab_size = len(tokenizer.word_index) + 1
 optimizer = Adam(learning_rate=0.0001)
@@ -77,23 +76,23 @@ m1.summary()
 
 ##########################################################################
 
-# Training and getting results
+#training and getting results
 
 history = m1.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
 
-# Evaluate the model
+#evaluate the model
 loss, accuracy = m1.evaluate(X_test, y_test)
 print(f'Loss: {loss}, Accuracy: {accuracy * 100:.2f}%')
 
 from sklearn.metrics import precision_score, recall_score
 
-# Predict on validation data
+#predict on validation data
 y_val_pred_prob_m1 = m1.predict(X_test)
 y_val_pred_m1 = (y_val_pred_prob_m1 > 0.5).astype(int)  
 
 y_val_true_m1 = y_test
 
-# Calculate precision and recall for binary classification
+#calculate precision and recall for binary classification
 precision_m1 = precision_score(y_val_true_m1, y_val_pred_m1)
 recall_m1 = recall_score(y_val_true_m1, y_val_pred_m1)
 
@@ -118,7 +117,7 @@ print(f'F1 Score: {f1_m1:.2f}')
 
 import matplotlib.pyplot as plt
 
-# Plotting training and validation loss
+#plotting training and validation loss
 plt.figure(figsize=(10, 5))
 plt.plot(history.history['loss'], label='Train Loss')
 plt.plot(history.history['val_loss'], label='Validation Loss')
@@ -128,7 +127,7 @@ plt.xlabel('Epoch')
 plt.legend(loc='upper right')
 plt.show()
 
-# Plotting training and validation accuracy
+#plotting train and val accuracy
 plt.figure(figsize=(10, 5))
 plt.plot(history.history['accuracy'], label='Train Accuracy')  # Adjust if different key
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy')  # Adjust if different key
@@ -140,18 +139,9 @@ plt.show()
 
 
 from sklearn.metrics import f1_score
-# Data to plot
+#data to plot
 metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
 values = [accuracy, precision_m1, recall_m1, f1_m1]
-
-# Creating the bar plot
-plt.figure(figsize=(10, 5))
-sns.barplot(metrics, values)
-plt.title('Model Performance Metrics')
-plt.ylabel('Value')
-for i, value in enumerate(values):
-    plt.text(i, value, f'{value:.2f}', ha = 'center', va = 'bottom')
-plt.show()
 
 
 

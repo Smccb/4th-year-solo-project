@@ -27,8 +27,8 @@ dataset1 = pd.read_json("Final_Model/Twitter/data_without_hashtags.json")
 dataset2 = pd.read_json("Datasets/Sarcasm_Headlines_Dataset.json", lines=True)
 
 #########################################################################
-# Preprocessing
-# Dataset 1
+#preprocessing
+# Dataset 1 (Twitter)
 x_name1 =  'text'
 y_name1 = 'isSarcastic'
 
@@ -37,7 +37,7 @@ dataset1 = prep.replaceEmoji_emoticon(dataset1)
 dataset1['text'] = dataset1.text.apply(prep.replace_abbreviations)
 dataset1['text'] = dataset1.text.apply(prep.remove_user_mentions)
 
-# Dataset 2
+# Dataset 2 (News)
 y_name2 = "is_sarcastic"
 x_name2 = "headline"
 
@@ -47,18 +47,20 @@ dataset2 = prep.contractions_replaced(dataset2 , x_name2)
 
 #########################################################################
 
+#this was code for testing
 # file_path = 'Final_Model/Twitter/Test_data.json'
 
 # temp_df = pd.read_json(file_path)
 # test_text = temp_df['text']
 # test_labels = temp_df['isSarcastic']
 
-# Split the dataset into training and testing sets
+#split the dataset into training and testing sets
 X_train1, X_test1, y_train1, y_test1 = train_test_split(dataset1['text'], dataset1['isSarcastic'], test_size=0.3, random_state=42)
 
 X_train2, X_test2, y_train2, y_test2 = train_test_split(dataset2['headline'], dataset2['is_sarcastic'], test_size=0.3, random_state=42)
 
 
+#testing for news dataset test
 # data = [{"headline": text, "is_sarcastic": label} for text, label in zip(X_test, y_test)]
 # # Writing the data to a JSON file
 # with open('test_data.json', 'w') as json_file:
@@ -71,17 +73,17 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(dataset2['headline'], da
 
 #########################################################################
 
-# Tokenize
+#tokenize data
 max_length = 140
 X_train1, X_test1, X_train2, X_test2, tokenizer =tokenise.tweetTokenizer(X_train1, X_test1, X_train2, X_test2, max_length)
 
 ##################################################################
 
-#Create model
+#create model
 embedding_dim = 175
 vocab_size = len(tokenizer.word_index) + 1
 
-optimizer = Adam(learning_rate=5.3254130613090156e-05)
+optimizer = Adam(learning_rate=5.3254130613090156e-05) #learning rate in scientific notation
 m1 = Sequential()
 m1.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_length))
 m1.add(LSTM(units=10))
@@ -94,7 +96,7 @@ m1.summary()
 
 ##########################################################################
 
-# Training and getting results
+#training and getting results
 
 # News
 history1 = m1.fit(
@@ -108,7 +110,7 @@ history1 = m1.fit(
 history2 = m1.fit(
     X_train1, y_train1,
     batch_size=128,
-    epochs=12,
+    epochs=10,
     validation_data=(X_test1, y_test1)
 )
 
@@ -116,30 +118,30 @@ history2 = m1.fit(
 
 loss1, accuracy1 = m1.evaluate(X_test1, y_test1)
 loss2, accuracy2 = m1.evaluate(X_test2, y_test2)
-print(f'Test Accuracy for Dataset 1: {accuracy1*100:.2f}%')
-print(f'Test Accuracy for Dataset 2: {accuracy2*100:.2f}%')
+print(f'Test Accuracy for Dataset Twitter: {accuracy1*100:.2f}%')
+print(f'Test Accuracy for Dataset News: {accuracy2*100:.2f}%')
 
 
 
-# Predict on validation data
+#predict on validation data
 y_val_pred_prob_m1 = m1.predict(X_test1)
 y_val_pred_m1 = (y_val_pred_prob_m1 > 0.5).astype(int)  
 
-# Calculate precision and recall for binary classification
+#calculate precision and recall for binary classification
 precision_m1 = precision_score(y_test1, y_val_pred_m1)
 recall_m1 = recall_score(y_test1, y_val_pred_m1)
 
-# print the results
+#print the results
 print(f'Precision1: {precision_m1:.4f}')
 print(f'Recall1: {recall_m1:.4f}')
 f1_m1 = f1_score(y_test1, y_val_pred_m1)
 print(f'F1 Score1: {f1_m1:.2f}')
 
-# Predict on validation data
+#predict on validation data
 y_val_pred_prob_m1 = m1.predict(X_test2)
 y_val_pred_m1 = (y_val_pred_prob_m1 > 0.5).astype(int)  
 
-# Calculate precision and recall for binary classification
+#calculate precision and recall for binary classification
 precision_m1 = precision_score(y_test2, y_val_pred_m1)
 recall_m1 = recall_score(y_test2, y_val_pred_m1)
 
@@ -150,18 +152,18 @@ f1_m1 = f1_score(y_test2, y_val_pred_m1)
 print(f'F1 Score2: {f1_m1:.2f}')
 
 #####################################################################
-# Saving
+#saving
+import joblib
 
-# # Save the tokenizer
-# with open('Final_Model/Twitter/Tokenizer2.pickle', 'wb') as handle:
-#     pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-# import joblib
+# save tokenizer
+with open('Combined/Tokenizer_combined.pickle', 'wb') as handle:
+    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-# # Save the model architecture
-# with open('Final_Model/Twitter/model_cudnn_lstm_architecture2.joblib', 'wb') as f:
-#     joblib.dump(m1.to_json(), f)
+# save model architecture
+with open('Combined/model_cudnn_lstm_architectureC.joblib', 'wb') as f:
+    joblib.dump(m1.to_json(), f)
 
-# # Save the model weights
-# m1.save_weights('Final_Model/Twitter/model_cudnn_lstm_weights2.h5')
+# Save the model weights
+m1.save_weights('Combined/model_cudnn_lstm_weightsC.h5')
 

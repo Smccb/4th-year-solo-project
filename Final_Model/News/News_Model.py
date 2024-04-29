@@ -32,54 +32,49 @@ column_name_to_remove = 'article_link'
 dataset = dataset.drop(columns=[column_name_to_remove])
 
 ##########################################################################
-#Preproccessing
+#preproccessing
 y_name = "is_sarcastic"
 x_name = "headline"
-# Random oversample
+#random oversample
 dataset = prep.oversample(dataset.headline, dataset.is_sarcastic, x_name, y_name)
 
-# Lowercasing text
+#lowercasing text
 dataset['headline'] = dataset['headline'].str.lower()
 
-# Replace contractions
+#replace contractions
 dataset = prep.contractions_replaced(dataset , x_name)
 
 
 
 ##########################################################################
-
-# file_path = 'Final_Model/News/Test_data.json'
-
-# temp_df = pd.read_json(file_path)
-
-# test_text = temp_df['headline']
-# test_labels = temp_df['is_sarcastic']
+#split training and testing data
 
 X_train, X_test, y_train, y_test = train_test_split(dataset['headline'], dataset['is_sarcastic'], test_size=0.3, random_state=42)
 
-#data = [{"text": text, "isSarcastic": label} for text, label in zip(X_test, y_test)]
 
-# # Writing the data to a JSON file
-# with open('test_data.json', 'w') as json_file:
-#     json.dump(data, json_file, indent=4)
+column_names = ['toRemove', 'isSarcastic', 'text']
+file_path = 'Combined/Test_v1.txt'
+dataset = pd.read_csv(file_path, sep='\t', header=None, names=column_names)
 
-# print("Data has been written to test_data.json")
+test_text = dataset['text']
+test_labels = dataset['isSarcastic']
 
-# X_test = test_text
-# y_test = test_labels
+#shuffle and quarter dataset
+X_half1, X_half2, y_half1, y_half2 = train_test_split(test_text, test_labels, test_size=0.5, random_state=1)
+X_test, X_quarter2, y_test, y_quarter2 = train_test_split(X_half1, y_half1, test_size=0.5, random_state=1)
 
 #######################################################################
 
-# Tokenizer
-max_length = 140
+#tokenizer
+max_length = 100 #140 for using combined model saved otherwise 100
 X_train, X_test, tokenizer =tokenise.regTokeniser(X_train, X_test, max_length)
 
 ######################################################################
 
-# Create model
+#create model
 embedding_dim = 175
 
-# Define the vocabulary size based on the actual number of unique words in the training data
+#define the vocabulary size based on the actual number of unique words in the training data
 vocab_size = len(tokenizer.word_index) + 1
 
 optimizer = Adam(learning_rate=0.00006784)
@@ -97,13 +92,13 @@ m1.summary()
 ########################################################################
 
 
-# Training and Results
+#training and results
 history = m1.fit(X_train, y_train, epochs=8, batch_size=128, validation_data=(X_test, y_test))
 
 loss, accuracy = m1.evaluate(X_test, y_test)
 print(f'Loss: {loss}, Accuracy: {accuracy * 100:.2f}%')
 
-# Predict on validation data
+#predict on val data
 y_val_pred_prob_m1 = m1.predict(X_test)
 y_val_pred_m1 = (y_val_pred_prob_m1 > 0.5).astype(int)  
 
@@ -126,22 +121,22 @@ print(f'F1 Score: {f1_m1:.2f}')
 #####################################################################
 # Saving
 
-# Save the tokenizer
+#save the tokenizer
 with open('Final_Model/News/TokenizerN.pickle', 'wb') as handle:
     pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 import joblib
 
-# Save the model architecture
+#save the model architecture
 with open('Final_Model/News/model_cudnn_lstm_architectureN.joblib', 'wb') as f:
     joblib.dump(m1.to_json(), f)
 
-# Save the model weights
+#save the model weights
 m1.save_weights('Final_Model/News/model_cudnn_lstm_weightsN.h5')
 
 import matplotlib.pyplot as plt
 
-# Plotting training and validation loss
+#plotting train and val loss
 plt.figure(figsize=(10, 5))
 plt.plot(history.history['loss'], label='Train Loss')
 plt.plot(history.history['val_loss'], label='Validation Loss')
@@ -151,10 +146,10 @@ plt.xlabel('Epoch')
 plt.legend(loc='upper right')
 plt.show()
 
-# Plotting training and validation accuracy
+#plotting train and val accuracy
 plt.figure(figsize=(10, 5))
-plt.plot(history.history['accuracy'], label='Train Accuracy')  # Adjust if different key
-plt.plot(history.history['val_accuracy'], label='Validation Accuracy')  # Adjust if different key
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.title('Model Accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')

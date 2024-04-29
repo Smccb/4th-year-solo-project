@@ -1,4 +1,4 @@
-#All preprocessing functions
+# All preprocessing functions
 
 import numpy as np
 import tensorflow as tf
@@ -24,10 +24,10 @@ def remove_Sarcasm_hashtag():
     file_path = 'Datasets/Train_v1.txt'
     column_names = ['toRemove', 'isSarcastic', 'text']
 
-    # Read the dataset
+    # read the dataset
     data = pd.read_csv(file_path, sep='\t', header=None, names=column_names)
 
-    # Define patterns to remove
+    # define patterns to remove
     patterns = [
         r'#sarcasm\b',
         r'#not\b',
@@ -41,13 +41,13 @@ def remove_Sarcasm_hashtag():
     for pattern in patterns:
         data['text'] = data['text'].apply(lambda x: re.sub(pattern, '', x))
 
-    # Drop the 'toRemove' column
+    # drop the toRemove column
     data.drop(columns=['toRemove'], inplace=True)
 
-    # Convert DataFrame to dictionary
+    # convert DF to dictionary
     data_dict = data.to_dict()
 
-    # Save the dictionary to a JSON file
+    # save the dict to a json file
     with open('Final_Model/Twitter/cleaned_sarcasm.json', 'w') as f:
         json.dump(data_dict, f, indent=4)
 
@@ -55,7 +55,7 @@ def remove_Sarcasm_hashtag():
 
 #######################################################################################
 
-# Undersampling
+# undersampling
 def undersample(dataset, colName):
     class_counts = dataset[colName].value_counts()
 
@@ -68,23 +68,23 @@ def undersample(dataset, colName):
 
     balanced_data = pd.concat([majority_class_sampled, dataset[dataset[colName] == minority_class]])
 
-    # Shuffle the balanced dataset
+    # shuffle the balanced dataset
     balanced_data = balanced_data.sample(frac=1, random_state=1).reset_index(drop=True)
     return balanced_data
 
 #####################################################
 
-# Random oversampling
+# random oversampling
 def oversample(text, label, x_name, y_name):
     text = text.values.reshape(-1, 1)
     
-    # Define and apply RandomOverSampler
+    # RandomOverSampler
     ros = RandomOverSampler(random_state=42)
     X_res, y_res = ros.fit_resample(text, label)
     
     X_res = X_res.flatten()
     
-    # Create and return the new DataFrame with correctly shaped data
+    # create and return the new DataFrame with correctly shaped data
     oversampled_dataset = pd.DataFrame({
         x_name: X_res,
         y_name: y_res
@@ -95,7 +95,7 @@ def oversample(text, label, x_name, y_name):
 
 ################################################
 
-# Remove stopwords
+# remove stopwords
 def remove_stopwords(text):
     stop_words = set(stopwords.words('english'))
     words = word_tokenize(text)
@@ -104,7 +104,7 @@ def remove_stopwords(text):
 
 ######################################################
 
-# Emoji and emoticon replacement
+# emoji and emoticon replacement
 
 def replace_emojis(text):
     return emoji.demojize(text, delimiters=(" ", " "))
@@ -133,7 +133,7 @@ def replace_emoticons(text):
     
     pattern = re.compile(r"[:;]['-]?[)DPO|/\\@x3*$p]", re.IGNORECASE)
 
-    # function to replace match with corresponding word
+    # replace match with corresponding word
     def replace_func(match):
         return emoticon_dict_lower.get(match.group().lower(), match.group())
 
@@ -146,21 +146,20 @@ def replaceEmoji_emoticon(dataset):
 
 #######################################################################
 
-#Remove hashtag and word
-# Function to remove hashtags from a single text
+# remove hashtag and word
 def remove_hashtags(text):
     pattern = r'\#\w+'
     return re.sub(pattern, '', text)
 
 ######################################################################
 
-# Remove @usersname
+# remove @usersname
 def remove_user_mentions(text):
     pattern = re.compile(r'@\w+')
     return pattern.sub('person', text)
 #####################################################################
 
-# Abbreviations replacement
+# abbreviations replacement
 def replace_abbreviations(text):
     abbreviation_mapping = {
     'OMG': 'oh my god',
@@ -193,12 +192,10 @@ def replace_abbreviations(text):
 
     pattern = re.compile(r'\b(' + '|'.join(re.escape(abbreviation) for abbreviation in abbreviation_mapping.keys()) + r')\b', re.IGNORECASE)
 
-    #replace abbreviations with its full form
+    # replace abbreviations with full form
     def replace(match):
-        #preserving the original case
         return abbreviation_mapping[match.group().upper()]
 
-    #replace all matches in the text
     return pattern.sub(replace, text)
 
 
@@ -206,7 +203,7 @@ def replace_abbreviations(text):
 
 ###############################################################
 
-# Put preprocessed text in JSON
+# put preprocessed text in JSON
 def turnToJSON(dataset):
     data_dict = dataset.to_dict(orient='records')
 
@@ -215,7 +212,7 @@ def turnToJSON(dataset):
 
 #################################################################
 
-#stemming
+# stemming
 from nltk.stem import PorterStemmer
 stemmer = PorterStemmer()
 
@@ -224,29 +221,28 @@ def stem_words(text):
 
 #####################################################################
 
-#remove punctuation 
+# remove punctuation 
 def remove_punctuation(text):
     text = re.sub(r'[^\w\s]', '', text)
     return text
 
 ####################################################################
 
-#remove urls
+# remove urls
 def remove_URL(text):
     text = re.sub(r'http\S+', '', text)
     return text
 
 #################################################################
 
-#remove # from the rest of the text
+# remove # from the rest of the text
 def remove_hashtag_only(text):
     text = re.sub(r'#', '', text)
     return text
 
 ################################################################
 
-# Replace contractions
-#contradictions fixes
+# replace contractions
 def contractions_replaced(dataset , col_name):
     contractions_dict = {
         "ain't": "am not",
@@ -324,7 +320,7 @@ def contractions_replaced(dataset , col_name):
     
     return dataset
 
-#  ^uses tmu
+# "uses tmu
 
 ######################################################################
 

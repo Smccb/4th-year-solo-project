@@ -59,9 +59,6 @@ optimizer = Adam(learning_rate=0.0001)
 
 m1 = Sequential()
 m1.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_length))
-# m1.add(CuDNNLSTM(units=10))
-# m1.add(Dense(units=1, activation='sigmoid'))
-
 m1.add(LSTM(units=10))
 m1.add(Dense(units=1, activation='sigmoid'))
 
